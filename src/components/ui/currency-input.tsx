@@ -22,7 +22,13 @@ const CurrencyInput = React.forwardRef<
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const inputValue = e.target.value;
     const numericValue = inputValue.replace(/[^0-9]/g, '');
-    onChange?.(numericValue as any);
+    onChange?.({
+      ...e,
+      target: {
+        ...e.target,
+        value: numericValue,
+      },
+    });
   };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {

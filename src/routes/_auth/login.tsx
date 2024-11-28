@@ -1,4 +1,3 @@
-import {invoke} from '@tauri-apps/api/core';
 import {createFileRoute, Link, useNavigate} from '@tanstack/react-router';
 
 import {zodResolver} from '@hookform/resolvers/zod';
