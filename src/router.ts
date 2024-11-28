@@ -6,9 +6,6 @@ import {routeTree} from './routeTree.gen';
 export const router = createRouter({
   routeTree,
   notFoundMode: 'root',
-  context: {
-    custom: null,
-  },
 });
 
 // Register the router instance for type safety
