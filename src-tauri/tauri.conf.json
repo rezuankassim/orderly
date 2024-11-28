@@ -24,6 +24,7 @@
     }
   },
   "bundle": {
+    "createUpdaterArtifacts": true,
     "active": true,
     "targets": "all",
     "icon": [
@@ -35,6 +36,12 @@
     ]
   },
   "plugins": {
+    "updater: {
+      "pubKey": "",
+      "endpoints": [
+        "https://github.com/rezuankassim/orderly/releases/latest/download/latest.json"
+      ] 
+    }
     "sql": {
       "preload": ["sqlite:mydatabase.db"]
     }
