@@ -43,8 +43,8 @@ export const columns: ColumnDef<Vehicles>[] = [
   },
   {
     id: 'actions',
-    cell: ({row}) => {
-      const vehicle = row.original;
+    cell: () => {
+      // const vehicle = row.original;
 
       return (
         <DropdownMenu>

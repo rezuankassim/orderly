@@ -1,6 +1,5 @@
 import * as React from 'react';
 import {
-  ArrowLeftRightIcon,
   AudioWaveform,
   BoxesIcon,
   ChartPieIcon,
@@ -9,10 +8,8 @@ import {
   Command,
   GalleryVerticalEnd,
   HomeIcon,
-  Map,
   SettingsIcon,
   UsersIcon,
-  WalletMinimalIcon,
 } from 'lucide-react';
 
 import {NavMain} from '@/components/nav-main';
