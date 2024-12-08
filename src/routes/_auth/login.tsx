@@ -1,3 +1,4 @@
+// import {readFile, BaseDirectory, open} from '@tauri-apps/plugin-fs';
 import {createFileRoute, Link, useNavigate} from '@tanstack/react-router';
 
 import {zodResolver} from '@hookform/resolvers/zod';
@@ -13,6 +14,7 @@ import {useState} from 'react';
 import {Checkbox} from '@/components/ui/checkbox';
 import {useToast} from '@/hooks/use-toast';
 import http from '@/lib/http';
+// import {invoke} from '@tauri-apps/api/core';
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -37,6 +39,18 @@ function Login() {
       remember: false,
     },
   });
+
+  // async function click() {
+  //   await invoke('print_example');
+  // const file = await open('bar.txt', {
+  //   write: true,
+  //   createNew: true,
+  //   baseDir: BaseDirectory.AppLocalData,
+  // });
+
+  // await file.write(new TextEncoder().encode('world'));
+  // await file.close();
+  // }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     // Do something with the form values.

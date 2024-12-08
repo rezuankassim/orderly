@@ -1,3 +1,4 @@
+import {invoke} from '@tauri-apps/api/core';
 import Database from '@tauri-apps/plugin-sql';
 
 import * as React from 'react';
@@ -198,7 +199,11 @@ function Tiktok() {
                         </div>
 
                         <DialogFooter>
-                          <Button type="button" className="w-full">
+                          <Button
+                            type="button"
+                            className="w-full"
+                            onClick={async () => await invoke('print_example')}
+                          >
                             Print
                           </Button>
                         </DialogFooter>
