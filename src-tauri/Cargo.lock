@@ -126,6 +126,7 @@ version = "0.1.0"
 dependencies = [
  "keyring",
  "log",
+ "printers",
  "reqwest",
  "serde",
  "serde_json",
@@ -3392,6 +3393,15 @@ name = "precomputed-hash"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "925383efa346730478fb4838dbe9137d2a47675ad789c546d150a6e1dd4ab31c"
+
+[[package]]
+name = "printers"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f4b387e9c73d793a179aa34077e3e291c2e2f6cf7a9bd62c3ce392c1cfac14ae"
+dependencies = [
+ "libc",
+]
 
 [[package]]
 name = "proc-macro-crate"
