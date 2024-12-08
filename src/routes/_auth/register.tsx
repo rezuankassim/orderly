@@ -1,4 +1,4 @@
-import {createFileRoute, Link} from '@tanstack/react-router';
+import {createFileRoute, Link, useNavigate} from '@tanstack/react-router';
 
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
@@ -16,6 +16,7 @@ import {useToast} from '@/hooks/use-toast';
 
 const formSchema = z.object({
   fullName: z.string().min(3),
+  username: z.string().min(3),
   email: z.string().email(),
   password: z.string().min(8),
   agree: z.boolean().default(false),
@@ -26,12 +27,14 @@ export const Route = createFileRoute('/_auth/register')({
 });
 
 function Register() {
+  const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
   const {toast} = useToast();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       fullName: '',
+      username: '',
       email: '',
       password: '',
       agree: false,
@@ -43,8 +46,20 @@ function Register() {
     // ✅ This will be type-safe and validated.
 
     http
-      .post('/register', values)
-      .then()
+      .post('/register', {
+        name: values.fullName,
+        username: values.username,
+        email: values.email,
+        password: values.password,
+        terms: values.agree,
+      })
+      .then(res => {
+        const data = res.data;
+
+        localStorage.setItem('access_token', data.token.token);
+
+        navigate({to: '/dashboard'});
+      })
       .catch(e => {
         if (e.response?.status === 422) {
           toast({
@@ -93,6 +108,24 @@ function Register() {
                     <IconInput
                       leftIcon={<UserIcon className="h-4 w-4 text-greyscale-400" />}
                       placeholder="Johnny English"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="username"
+              render={({field}) => (
+                <FormItem className="mt-4">
+                  <FormLabel>Username</FormLabel>
+                  <FormControl>
+                    <IconInput
+                      leftIcon={<UserIcon className="h-4 w-4 text-greyscale-400" />}
+                      placeholder="johnnyenglish"
                       {...field}
                     />
                   </FormControl>
