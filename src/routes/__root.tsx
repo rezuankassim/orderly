@@ -1,4 +1,4 @@
-import {check} from '@tauri-apps/plugin-updater';
+import {check, Update} from '@tauri-apps/plugin-updater';
 import {relaunch} from '@tauri-apps/plugin-process';
 
 import {createRootRouteWithContext, Link, Outlet} from '@tanstack/react-router';
@@ -9,9 +9,15 @@ import Logo from '@/components/logo';
 import {Button} from '@/components/ui/button';
 import Sorry from '@/components/illustration/sorry';
 import Stress from '@/components/illustration/stress';
-import {useToast} from '@/hooks/use-toast';
-import {useEffect} from 'react';
-import {ToastAction} from '@radix-ui/react-toast';
+import {useEffect, useState} from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {Progress} from '@/components/ui/progress';
 
 interface MyRouterContext {
   clickClearForm?: () => void;
@@ -83,25 +89,55 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 
 function Root() {
   const {update} = Route.useLoaderData();
-  const {toast} = useToast();
+  const [progressValue, setProgressValue] = useState(0);
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
 
   useEffect(() => {
-    if (update) {
-      toast({
-        title: 'Update Available',
-        description: `An update is available for this application`,
-        action: (
-          <ToastAction altText="Update" asChild>
-            <Button onClick={relaunch}>Update</Button>
-          </ToastAction>
-        ),
+    async function updateApp(update: Update, downloaded: number, contentLength: number) {
+      await update.downloadAndInstall(event => {
+        switch (event.event) {
+          case 'Started':
+            contentLength = event.data.contentLength ?? 0;
+            break;
+          case 'Progress':
+            downloaded += event.data.chunkLength;
+            setProgressValue((downloaded / contentLength) * 100);
+            break;
+          case 'Finished':
+            console.log('download finished');
+            break;
+        }
       });
+
+      relaunch();
     }
-  }, [update, toast]);
+
+    if (update) {
+      setShowUpdateDialog(true);
+
+      const downloaded = 0;
+      const contentLength = 0;
+
+      updateApp(update, downloaded, contentLength);
+    }
+  }, [update]);
 
   return (
     <>
       <div className="h-full">
+        <Dialog open={showUpdateDialog} onOpenChange={() => setShowUpdateDialog(true)}>
+          <DialogContent withoutClose>
+            <DialogHeader>
+              <DialogTitle>Updating</DialogTitle>
+            </DialogHeader>
+            <DialogDescription>
+              <p>Please be patient, we are updating this application for you.</p>
+
+              <Progress className="mt-4" value={progressValue} />
+            </DialogDescription>
+          </DialogContent>
+        </Dialog>
+
         <Outlet />
         <Toaster />
       </div>
