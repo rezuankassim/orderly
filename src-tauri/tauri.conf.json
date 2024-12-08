@@ -38,7 +38,10 @@
   "plugins": {
     "updater": {
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEM4ODREQjJENjUxRjU1ODAKUldTQVZSOWxMZHVFeUd6WkxuRlJLZncwOVlmQWxEQUFJSmFHcVdaVVRZWXpscTRmdnJSSFU4N1kK",
-      "endpoints": ["https://github.com/rezuankassim/orderly/releases/latest/download/latest.json"]
+      "endpoints": ["https://github.com/rezuankassim/orderly/releases/latest/download/latest.json"],
+      "windows": {
+        "installMode": "basicUi"
+      }
     },
     "sql": {
       "preload": ["sqlite:mydatabase.db"]

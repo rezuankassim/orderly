@@ -1,8 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use printers::get_printers;
 use tauri_plugin_sql::{Migration, MigrationKind};
-use printers::{get_printers};
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
@@ -10,7 +10,10 @@ fn retrieve_printers() -> String {
     let printers = get_printers();
 
     // Prevent this error `Vec<Printer>` doesn't implement `std::fmt::Display`
-    let printers_vec = printers.iter().map(|printer| format!("{:?}", printer)).collect::<Vec<String>>();
+    let printers_vec = printers
+        .iter()
+        .map(|printer| format!("{:?}", printer))
+        .collect::<Vec<String>>();
 
     // return json with array of printers
     format!("{:?}", printers_vec)
@@ -28,6 +31,7 @@ fn main() {
     ];
 
     tauri::Builder::default()
+        .plugin(tauri_plugin_process::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(
             tauri_plugin_sql::Builder::default()

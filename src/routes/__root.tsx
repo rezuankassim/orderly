@@ -1,3 +1,6 @@
+import {check} from '@tauri-apps/plugin-updater';
+import {relaunch} from '@tauri-apps/plugin-process';
+
 import {createRootRouteWithContext, Link, Outlet} from '@tanstack/react-router';
 
 import '../index.css';
@@ -6,6 +9,9 @@ import Logo from '@/components/logo';
 import {Button} from '@/components/ui/button';
 import Sorry from '@/components/illustration/sorry';
 import Stress from '@/components/illustration/stress';
+import {useToast} from '@/hooks/use-toast';
+import {useEffect} from 'react';
+import {ToastAction} from '@radix-ui/react-toast';
 
 interface MyRouterContext {
   clickClearForm?: () => void;
@@ -13,14 +19,7 @@ interface MyRouterContext {
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
-  component: () => (
-    <>
-      <div className="h-full">
-        <Outlet />
-        <Toaster />
-      </div>
-    </>
-  ),
+  component: Root,
   notFoundComponent: () => {
     return (
       <div className="flex h-full flex-col bg-white">
@@ -74,3 +73,32 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     );
   },
 });
+
+function Root() {
+  const {toast} = useToast();
+
+  useEffect(() => {
+    const checkUpdate = async () => {
+      const update = await check();
+
+      if (update) {
+        toast({
+          title: 'Update Available',
+          description: 'An update is available for this application',
+          action: <ToastAction altText="Update">Update</ToastAction>,
+        });
+      }
+    };
+
+    checkUpdate();
+  });
+
+  return (
+    <>
+      <div className="h-full">
+        <Outlet />
+        <Toaster />
+      </div>
+    </>
+  );
+}
