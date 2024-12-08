@@ -1,6 +1,9 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+// use printpdf::*;
+// use std::fs::File;
+// use std::io::BufWriter;
 use printers::get_printers;
 use tauri_plugin_sql::{Migration, MigrationKind};
 
@@ -17,6 +20,19 @@ fn retrieve_printers() -> String {
 
     // return json with array of printers
     format!("{:?}", printers_vec)
+}
+
+#[tauri::command]
+fn print_example() {
+    // let (doc, page1, layer1) = PdfDocument::new("Example Label", Mm(50.0), Mm(80.0), "Layer 1");
+    // let current_layer = doc.get_page(page1).get_layer(layer1);
+
+    // let text = "Hello, world!";
+
+    // current_layer.use_text(text, 48.0, Mm(25.0), Mm(40.0));
+
+    // doc.save(&mut BufWriter::new(File::create("example.pdf").unwrap()))
+    //     .unwrap();
 }
 
 fn main() {
@@ -38,7 +54,7 @@ fn main() {
                 .add_migrations("sqlite:mydatabase.db", migrations)
                 .build(),
         )
-        .invoke_handler(tauri::generate_handler![retrieve_printers])
+        .invoke_handler(tauri::generate_handler![retrieve_printers, print_example])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
