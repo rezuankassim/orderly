@@ -84,8 +84,12 @@ function Root() {
       if (update) {
         toast({
           title: 'Update Available',
-          description: 'An update is available for this application',
-          action: <ToastAction altText="Update">Update</ToastAction>,
+          description: `An update (${update.version}) is available for this application`,
+          action: (
+            <ToastAction altText="Update" asChild>
+              <Button onClick={async () => await relaunch()}>Update</Button>
+            </ToastAction>
+          ),
         });
       }
     };
