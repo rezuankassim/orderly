@@ -27,7 +27,6 @@ export const Route = createFileRoute('/_protected/_settings/settings/general')({
   component: General,
   loader: async () => {
     const printers = await invoke('retrieve_printers');
-    console.log(printers);
     const db = await Database.load('sqlite:mydatabase.db');
     const result: Record<string, string>[] = await db.select(
       'SELECT * FROM settings WHERE name = "general"'
@@ -35,6 +34,7 @@ export const Route = createFileRoute('/_protected/_settings/settings/general')({
 
     return {
       name: result[0] ? result[0].content : '',
+      printers,
     };
   },
   shouldReload: true,
@@ -44,7 +44,7 @@ function General() {
   const context = useRouteContext({
     from: '/_protected/_settings/settings/general',
   });
-  const {name} = Route.useLoaderData();
+  const {name, printers} = Route.useLoaderData();
   const {toast} = useToast();
   const router = useRouter();
 
@@ -119,6 +119,8 @@ function General() {
               )}
             />
           </div>
+
+          <div className="mt-4">{JSON.stringify(printers)}</div>
 
           <Button ref={ref} type="submit" className="mt-auto hidden w-full">
             Create
