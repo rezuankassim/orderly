@@ -1,3 +1,4 @@
+import {invoke} from '@tauri-apps/api/core';
 import Database from '@tauri-apps/plugin-sql';
 
 import * as React from 'react';
@@ -25,6 +26,8 @@ const formSchema = z.object({
 export const Route = createFileRoute('/_protected/_settings/settings/general')({
   component: General,
   loader: async () => {
+    const printers = await invoke('retrieve_printers');
+    console.log(printers);
     const db = await Database.load('sqlite:mydatabase.db');
     const result: Record<string, string>[] = await db.select(
       'SELECT * FROM settings WHERE name = "general"'
