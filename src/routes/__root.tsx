@@ -20,6 +20,13 @@ interface MyRouterContext {
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   component: Root,
+  loader: async () => {
+    const update = await check();
+
+    return {
+      update: update,
+    };
+  },
   notFoundComponent: () => {
     return (
       <div className="flex h-full flex-col bg-white">
@@ -75,27 +82,22 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
 });
 
 function Root() {
+  const {update} = Route.useLoaderData();
   const {toast} = useToast();
 
   useEffect(() => {
-    const checkUpdate = async () => {
-      const update = await check();
-
-      if (update) {
-        toast({
-          title: 'Update Available',
-          description: `An update (${update.version}) is available for this application`,
-          action: (
-            <ToastAction altText="Update" asChild>
-              <Button onClick={async () => await relaunch()}>Update</Button>
-            </ToastAction>
-          ),
-        });
-      }
-    };
-
-    checkUpdate();
-  });
+    if (update) {
+      toast({
+        title: 'Update Available',
+        description: `An update is available for this application`,
+        action: (
+          <ToastAction altText="Update" asChild>
+            <Button onClick={relaunch}>Update</Button>
+          </ToastAction>
+        ),
+      });
+    }
+  }, [update, toast]);
 
   return (
     <>
