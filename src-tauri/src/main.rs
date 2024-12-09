@@ -8,20 +8,34 @@ use tauri::Manager;
 use std::io::BufWriter;
 use printers::{get_printers, get_printer_by_name};
 use tauri_plugin_sql::{Migration, MigrationKind};
+use serde::Serialize;
+
+
+#[derive(Serialize)]
+struct SerializePrinter {
+    pub name: String,
+    pub system_name: String,
+    pub driver_name: String,
+}
 
 // Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
 #[tauri::command]
 fn retrieve_printers() -> String {
     let printers = get_printers();
 
-    // Prevent this error `Vec<Printer>` doesn't implement `std::fmt::Display`
-    let printers_vec = printers
-        .iter()
-        .map(|printer| format!("{:?}", printer))
-        .collect::<Vec<String>>();
+    let serialize_printers: Vec<SerializePrinter> = printers
+        .into_iter()
+        .map(|printer| SerializePrinter {
+            name: printer.name,
+            system_name: printer.system_name,
+            driver_name: printer.driver_name,
+        })
+        .collect();
 
-    // return json with array of printers
-    format!("{:?}", printers_vec)
+    // Convert printers to JSON
+    let json_result = serde_json::to_string(&serialize_printers);
+
+    return json_result.expect("Failed to convert printers to JSON");
 }
 
 #[tauri::command]
@@ -60,7 +74,7 @@ fn main() {
             description: "create_settings_table",
             sql: "CREATE TABLE settings (id INTEGER PRIMARY KEY, name VARCHAR(255) NOT NULL UNIQUE, content BLOB);",
             kind: MigrationKind::Up,
-        }
+        },
     ];
 
     tauri::Builder::default()

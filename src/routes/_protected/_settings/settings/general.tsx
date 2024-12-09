@@ -11,6 +11,19 @@ import {Form, FormControl, FormField, FormItem, FormLabel, FormMessage} from '@/
 import {Input} from '@/components/ui/input';
 import {Button} from '@/components/ui/button';
 import {useToast} from '@/hooks/use-toast';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+
+type Printers = {
+  name: string;
+  system_name: string;
+  driver_name: string;
+};
 
 const formSchema = z.object({
   name: z
@@ -21,12 +34,16 @@ const formSchema = z.object({
     .max(50, {
       message: 'Name must be at most 50 characters.',
     }),
+  printer_name: z
+    .string()
+    .min(3, {message: 'Printer name must be at least 3 characters.'})
+    .max(50, {message: 'Printer name must be at most 50 characters.'}),
 });
 
 export const Route = createFileRoute('/_protected/_settings/settings/general')({
   component: General,
   loader: async () => {
-    const printers = await invoke('retrieve_printers');
+    const printers = await invoke<string>('retrieve_printers');
     const db = await Database.load('sqlite:mydatabase.db');
     const result: Record<string, string>[] = await db.select(
       'SELECT * FROM settings WHERE name = "general"'
@@ -34,7 +51,7 @@ export const Route = createFileRoute('/_protected/_settings/settings/general')({
 
     return {
       name: result[0] ? result[0].content : '',
-      printers,
+      printers: JSON.parse(printers),
     };
   },
   shouldReload: true,
@@ -44,7 +61,7 @@ function General() {
   const context = useRouteContext({
     from: '/_protected/_settings/settings/general',
   });
-  const {name, printers} = Route.useLoaderData();
+  const {name, printers} = Route.useLoaderData() as {name: string; printers: Printers[]};
   const {toast} = useToast();
   const router = useRouter();
 
@@ -53,6 +70,7 @@ function General() {
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: name,
+      printer_name: '',
     },
   });
 
@@ -61,10 +79,11 @@ function General() {
     // ✅ This will be type-safe and validated.
     try {
       const db = await Database.load('sqlite:mydatabase.db');
+      const valuesStringify = JSON.stringify(values);
 
       await db.execute(
         'INSERT INTO settings (name, content) VALUES ("general", ?) ON CONFLICT(name) DO UPDATE SET content = ?',
-        [values.name, values.name]
+        [valuesStringify, valuesStringify]
       );
 
       toast({
@@ -118,9 +137,40 @@ function General() {
                 </FormItem>
               )}
             />
-          </div>
 
-          <div className="mt-4">{JSON.stringify(printers)}</div>
+            <FormField
+              control={form.control}
+              name="printer_name"
+              render={({field}) => (
+                <FormItem className="grid grid-flow-col grid-cols-2 items-center">
+                  <FormLabel className="text-base text-greyscale-400">Printer Name</FormLabel>
+                  <div className="flex flex-col">
+                    <FormControl>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                        value={field.value}
+                        name={field.name}
+                        disabled={field.disabled}
+                      >
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {printers.map(printer => (
+                            <SelectItem key={printer.name} value={printer.name}>
+                              {printer.name}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormMessage className="mt-3" />
+                  </div>
+                </FormItem>
+              )}
+            />
+          </div>
 
           <Button ref={ref} type="submit" className="mt-auto hidden w-full">
             Create

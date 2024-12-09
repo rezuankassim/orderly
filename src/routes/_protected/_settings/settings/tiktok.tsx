@@ -50,6 +50,16 @@ export const Route = createFileRoute('/_protected/_settings/settings/tiktok')({
     const result: Record<string, string>[] = await db.select(
       'SELECT * FROM settings WHERE name = "tiktok"'
     );
+    const generalResult: Record<string, string>[] = await db.select(
+      'SELECT * FROM settings WHERE name = "general"'
+    );
+
+    const newGeneralR = generalResult.map(r => {
+      return {
+        ...r,
+        content: JSON.parse(r.content),
+      };
+    });
 
     const newR = result.map(r => {
       return {
@@ -62,6 +72,7 @@ export const Route = createFileRoute('/_protected/_settings/settings/tiktok')({
       shop_name: newR[0] ? newR[0].content.shop_name : '',
       api_token: newR[0] ? newR[0].content.api_token : '',
       ticket: newR[0] ? newR[0].content.ticket : '',
+      printer_name: newGeneralR[0] ? newGeneralR[0].content.printer_name : '',
     };
   },
 });
@@ -70,7 +81,7 @@ function Tiktok() {
   const context = useRouteContext({
     from: '/_protected/_settings/settings/tiktok',
   });
-  const {shop_name, api_token, ticket} = Route.useLoaderData();
+  const {shop_name, api_token, ticket, printer_name} = Route.useLoaderData();
   const {toast} = useToast();
   const router = useRouter();
 
@@ -202,7 +213,8 @@ function Tiktok() {
                           <Button
                             type="button"
                             className="w-full"
-                            onClick={async () => await invoke('print_example')}
+                            disabled={!printer_name}
+                            onClick={async () => await invoke('print_example', {printer_name})}
                           >
                             Print
                           </Button>
