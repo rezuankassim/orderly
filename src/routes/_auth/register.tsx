@@ -78,7 +78,7 @@ function Register() {
           toast({
             variant: 'destructive',
             title: 'An error occurred',
-            description: 'An error occurred while processing your request',
+            description: 'An error occurred while processing your request ' + e.response,
           });
         }
       });
