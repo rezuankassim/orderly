@@ -1,5 +1,6 @@
 import {invoke} from '@tauri-apps/api/core';
 import Database from '@tauri-apps/plugin-sql';
+import {Document, Page, Text, View, StyleSheet, pdf} from '@react-pdf/renderer';
 
 import * as React from 'react';
 import {createFileRoute, useRouteContext, useRouter} from '@tanstack/react-router';
@@ -27,6 +28,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {useToast} from '@/hooks/use-toast';
+import {BaseDirectory, writeFile} from '@tauri-apps/plugin-fs';
 
 const formSchema = z.object({
   shop_name: z
@@ -42,6 +44,28 @@ const formSchema = z.object({
   }),
   ticket: z.string().refine(value => ['layout_1'].includes(value), 'Ticket must be Layout 1'),
 });
+
+const styles = StyleSheet.create({
+  page: {
+    flexDirection: 'column',
+    padding: 30,
+  },
+  section: {
+    margin: 10,
+    padding: 10,
+    fontSize: 14,
+  },
+});
+
+const MyPdfDocument = (shop_name: string) => (
+  <Document>
+    <Page size={{width: 141.73, height: 226.77}} style={styles.page}>
+      <View style={styles.section}>
+        <Text>{shop_name}</Text>
+      </View>
+    </Page>
+  </Document>
+);
 
 export const Route = createFileRoute('/_protected/_settings/settings/tiktok')({
   component: Tiktok,
@@ -130,6 +154,21 @@ function Tiktok() {
     form.reset();
   }
 
+  async function print() {
+    const pdfBlob = await pdf(MyPdfDocument(shop_name)).toBlob();
+    const arrayBuffer = await pdfBlob.arrayBuffer();
+
+    try {
+      const fileName = 'print-example.pdf';
+      const filePath = `./${fileName}`; // Saves to Tauri's default directory
+      await writeFile(filePath, new Uint8Array(arrayBuffer), {baseDir: BaseDirectory.AppLocalData});
+
+      await invoke('print_example', {printerName: printer_name});
+    } catch (error) {
+      console.error('Error saving PDF:', error);
+    }
+  }
+
   context.clickSubmitForm = clickSubmit;
   context.clickClearForm = clickClear;
 
@@ -210,14 +249,7 @@ function Tiktok() {
                         </div>
 
                         <DialogFooter>
-                          <Button
-                            type="button"
-                            className="w-full"
-                            disabled={!printer_name}
-                            onClick={async () =>
-                              await invoke('print_example', {printerName: printer_name})
-                            }
-                          >
+                          <Button type="button" className="w-full" onClick={print}>
                             Print
                           </Button>
                         </DialogFooter>

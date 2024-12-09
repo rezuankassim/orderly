@@ -1,5 +1,6 @@
-// import {readFile, BaseDirectory, open} from '@tauri-apps/plugin-fs';
+// import {BaseDirectory, writeFile} from '@tauri-apps/plugin-fs';
 import {createFileRoute, Link, useNavigate} from '@tanstack/react-router';
+// import {Document, Page, Text, View, StyleSheet, pdf} from '@react-pdf/renderer';
 
 import {zodResolver} from '@hookform/resolvers/zod';
 import {useForm} from 'react-hook-form';
@@ -15,6 +16,28 @@ import {Checkbox} from '@/components/ui/checkbox';
 import {useToast} from '@/hooks/use-toast';
 import http from '@/lib/http';
 // import {invoke} from '@tauri-apps/api/core';
+
+// const styles = StyleSheet.create({
+//   page: {
+//     flexDirection: 'column',
+//     padding: 30,
+//   },
+//   section: {
+//     margin: 10,
+//     padding: 10,
+//     fontSize: 14,
+//   },
+// });
+
+// const MyPdfDocument = () => (
+//   <Document>
+//     <Page size={{width: 141.73, height: 226.77}} style={styles.page}>
+//       <View style={styles.section}>
+//         <Text>Hello, this is a PDF created with react-pdf!</Text>
+//       </View>
+//     </Page>
+//   </Document>
+// );
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -41,15 +64,32 @@ function Login() {
   });
 
   // async function click() {
-  //   await invoke('print_example');
-  // const file = await open('bar.txt', {
-  //   write: true,
-  //   createNew: true,
-  //   baseDir: BaseDirectory.AppLocalData,
-  // });
+  //   try {
+  //     // Generate the PDF as a blob
+  //     const pdfBlob = await pdf(<MyPdfDocument />).toBlob();
 
-  // await file.write(new TextEncoder().encode('world'));
-  // await file.close();
+  //     // Convert the Blob to an ArrayBuffer
+  //     const arrayBuffer = await pdfBlob.arrayBuffer();
+
+  //     // Save the PDF using Tauri's fs plugin
+  //     const fileName = 'react-pdf-example.pdf';
+  //     const filePath = `./${fileName}`; // Saves to Tauri's default directory
+  //     await writeFile(filePath, new Uint8Array(arrayBuffer), {baseDir: BaseDirectory.AppLocalData});
+
+  //     alert(`PDF saved successfully as ${filePath}`);
+  //   } catch (error) {
+  //     console.error('Error saving PDF:', error);
+  //     alert('Failed to save PDF.');
+  //   }
+  //   // await invoke('print_example');
+  //   // const file = await open('bar.txt', {
+  //   //   write: true,
+  //   //   createNew: true,
+  //   //   baseDir: BaseDirectory.AppLocalData,
+  //   // });
+
+  //   // await file.write(new TextEncoder().encode('world'));
+  //   // await file.close();
   // }
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
@@ -97,6 +137,8 @@ function Login() {
         <h1 className="text-3xl font-semibold text-greyscale-900">Sign in to Monefy</h1>
         <p className="mt-4 text-greyscale-400">Send, spend and save smarter</p>
       </div>
+
+      {/* <Button onClick={click}>Print</Button> */}
 
       <div className="mt-8 w-full max-w-sm">
         <Form {...form}>
