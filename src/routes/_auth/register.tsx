@@ -78,7 +78,8 @@ function Register() {
           toast({
             variant: 'destructive',
             title: 'An error occurred',
-            description: 'An error occurred while processing your request ' + e.code,
+            description:
+              'An error occurred while processing your request ' + import.meta.env.VITE_API_URL,
           });
         }
       });
