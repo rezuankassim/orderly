@@ -214,7 +214,9 @@ function Tiktok() {
                             type="button"
                             className="w-full"
                             disabled={!printer_name}
-                            onClick={async () => await invoke('print_example', {printer_name})}
+                            onClick={async () =>
+                              await invoke('print_example', {printerName: printer_name})
+                            }
                           >
                             Print
                           </Button>
